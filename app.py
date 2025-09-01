@@ -9,7 +9,7 @@ app = FastAPI(title="Powerball Predictor API",
 
 # ====== Cargar modelo entrenado ======
 # Asegúrate de que 'modelo_powerball.h5' esté en la misma carpeta que app.py
-model = tf.keras.models.load_model("modelo_powerball.h5")
+model = tf.keras.models.load_model("modelo_powerball.keras")
 
 # ====== Endpoint raíz ======
 @app.get("/")
@@ -46,3 +46,4 @@ def predict(input_numbers: list[int]):
 # Nota: NO necesitamos uvicorn.run aquí para Render
 # El Start Command en Render será:
 # uvicorn app:app --host 0.0.0.0 --port $PORT
+
