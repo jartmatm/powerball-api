@@ -1,7 +1,11 @@
 import pandas as pd
+import numpy as np
+import tensorflow as tf
 import requests
+import os
 from bs4 import BeautifulSoup
 from url_years import urls
+from tensorflow.keras import layers, models
 
 all_data = []  # Lista para guardar todos los registros
 
@@ -59,9 +63,7 @@ df[columnas_numeros] = df[columnas_numeros].astype(int)
 
 # ======================= Modelo con TensorFlow/Keras =======================
 
-import numpy as np
-import tensorflow as tf
-from tensorflow.keras import layers, models
+
 
 # ======== 1) Preparar datos ========
 num_cols = [f"Numero{i}" for i in range(1, 8)] + ["Powerball"]
@@ -102,18 +104,18 @@ model = models.Sequential([
     layers.Dense(8, activation="sigmoid")  # salida 0-1
 ])
 
-model.compile(optimizer=tf.keras.optimizers.Adam(1e-3),
-              loss="mse",)
+model.compile(optimizer="adam", loss=tf.keras.losses.MeanSquaredError(), metrics=[tf.keras.metrics.MeanSquaredError()])
+
 
 # ======== 3) Entrenamiento ========
 print("Entrenando el modelo...")
 history = model.fit(X_sc, Y_sc, epochs=1500, batch_size=512, shuffle=False, verbose=0)
 
 # ======== 4) Guardar el modelo entrenado ========
-import os
+
 print("Directorio actual:", os.getcwd())
-model.save('modelo_powerball.h5')
-print("Modelo guardado como modelo_powerball.h5")
+model.save("modelo_powerball.keras")
+print("Modelo guardado como modelo_powerball.keras")
 
 # ======== 5) Helpers ========
 def postprocess_prediction(vec_float):
