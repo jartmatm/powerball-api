@@ -1,6 +1,6 @@
 fastapi
 pandas
-BeautifulSoup
+BeautifulSoup4
 uvicorn
 tensorflow
 numpy
