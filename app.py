@@ -1,7 +1,5 @@
 from fastapi import FastAPI
-from pydantic import BaseModel
-import numpy as np
-import tensorflow as tf
+from modelo_powerball import predict_from_last_draw  # Importa la función de tu script
 
 # ====== Instancia FastAPI ======
 app = FastAPI(
@@ -10,47 +8,32 @@ app = FastAPI(
     version="1.0"
 )
 
-# ====== Cargar modelo entrenado ======
-# Asegúrate de que 'modelo_powerball.keras' esté en la misma carpeta que app.py
-model = tf.keras.models.load_model("modelo_powerball.keras")
-
-# ====== Modelo de entrada ======
-class InputData(BaseModel):
-    numbers: list[int]
-
 # ====== Endpoint raíz ======
 @app.get("/")
 def root():
     return {"message": "Bienvenido a la API Powerball 🎰"}
 
-# ====== Endpoint de predicción ======
-@app.post("/predict/")
-def predict(data: InputData):
+# ====== Endpoint para predecir el siguiente sorteo ======
+@app.get("/predict_next/")
+def predict_next_draw():
     """
-    Recibe 7 números + Powerball en un JSON y devuelve predicción sugerida
+    Devuelve los números sugeridos para el siguiente sorteo,
+    usando el último sorteo histórico.
     """
-    input_numbers = data.numbers
-
-    if len(input_numbers) != 8:
-        return {"error": "Debes enviar 8 números: 7 principales + Powerball"}
-
     try:
-        # Convertir a numpy array
-        x_input = np.array(input_numbers).reshape(1, -1).astype(np.float32)
-
-        # Predicción usando el modelo
-        prediction = model.predict(x_input, verbose=0)
-
-        # Convertir a lista normal para JSON
-        result = prediction[0].tolist()
-
+        nums, pb = predict_from_last_draw()
         return {
-            "input": input_numbers,
-            "suggested_numbers": result
+            "suggested_numbers": nums,
+            "suggested_powerball": pb
         }
-
     except Exception as e:
         return {"error": str(e)}
+
+# ====== Para correr local ======
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True)
+
 
 
 
