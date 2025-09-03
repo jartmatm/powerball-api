@@ -1,15 +1,22 @@
 from fastapi import FastAPI
+from pydantic import BaseModel
 import numpy as np
 import tensorflow as tf
 
 # ====== Instancia FastAPI ======
-app = FastAPI(title="Powerball Predictor API",
-              description="API que sugiere números de Powerball basados en un modelo de IA",
-              version="1.0")
+app = FastAPI(
+    title="Powerball Predictor API",
+    description="API que sugiere números de Powerball basados en un modelo de IA",
+    version="1.0"
+)
 
 # ====== Cargar modelo entrenado ======
-# Asegúrate de que 'modelo_powerball.h5' esté en la misma carpeta que app.py
+# Asegúrate de que 'modelo_powerball.keras' esté en la misma carpeta que app.py
 model = tf.keras.models.load_model("modelo_powerball.keras")
+
+# ====== Modelo de entrada ======
+class InputData(BaseModel):
+    numbers: list[int]
 
 # ====== Endpoint raíz ======
 @app.get("/")
@@ -18,10 +25,12 @@ def root():
 
 # ====== Endpoint de predicción ======
 @app.post("/predict/")
-def predict(input_numbers: list[int]):
+def predict(data: InputData):
     """
-    Recibe 7 números + Powerball y devuelve predicción sugerida
+    Recibe 7 números + Powerball en un JSON y devuelve predicción sugerida
     """
+    input_numbers = data.numbers
+
     if len(input_numbers) != 8:
         return {"error": "Debes enviar 8 números: 7 principales + Powerball"}
 
@@ -43,7 +52,5 @@ def predict(input_numbers: list[int]):
     except Exception as e:
         return {"error": str(e)}
 
-# Nota: NO necesitamos uvicorn.run aquí para Render
-# El Start Command en Render será:
-# uvicorn app:app --host 0.0.0.0 --port $PORT
+
 
