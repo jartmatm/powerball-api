@@ -1,6 +1,0 @@
-fastapi
-pandas
-BeautifulSoup4
-uvicorn
-tensorflow
-numpy
