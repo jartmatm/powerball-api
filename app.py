@@ -1,5 +1,7 @@
 from fastapi import FastAPI
-from modelo_powerball import predict_from_last_draw  # Importa la función de tu script
+from modelo_powerball import predict_from_last_draw
+import os
+import uvicorn
 
 # ====== Instancia FastAPI ======
 app = FastAPI(
@@ -31,5 +33,5 @@ def predict_next_draw():
 
 # ====== Para correr local ======
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("app:app", host="0.0.0.0", port=10000, reload=False)
+    port = int(os.environ.get("PORT", 8000))  # Render asigna el puerto automáticamente
+    uvicorn.run(app, host="0.0.0.0", port=port)
