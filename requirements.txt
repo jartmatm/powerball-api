@@ -4,4 +4,4 @@ tensorflow
 pandas
 numpy
 beautifulsoup4
-requests    
+requests

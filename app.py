@@ -18,10 +18,6 @@ def root():
 # ====== Endpoint para predecir el siguiente sorteo ======
 @app.get("/predict_next/")
 def predict_next_draw():
-    """
-    Devuelve los números sugeridos para el siguiente sorteo,
-    usando el último sorteo histórico.
-    """
     try:
         nums, pb = predict_from_last_draw()
         return {
@@ -35,3 +31,4 @@ def predict_next_draw():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))  # Render asigna el puerto automáticamente
     uvicorn.run(app, host="0.0.0.0", port=port)
+
