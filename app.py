@@ -1,34 +1,37 @@
-from fastapi import FastAPI
-from modelo_powerball import predict_from_last_draw
+# app.py
 import os
+from fastapi import FastAPI
+from fastapi.responses import JSONResponse
 import uvicorn
+import modelo_powerball
 
-# ====== Instancia FastAPI ======
 app = FastAPI(
     title="Powerball Predictor API",
     description="API que sugiere números de Powerball basados en un modelo de IA",
     version="1.0"
 )
 
-# ====== Endpoint raíz ======
 @app.get("/")
 def root():
     return {"message": "Bienvenido a la API Powerball 🎰"}
 
-# ====== Endpoint para predecir el siguiente sorteo ======
+@app.get("/status")
+def status():
+    loaded, err = modelo_powerball.is_model_loaded()
+    return {"model_loaded": loaded, "model_error": err}
+
 @app.get("/predict_next/")
 def predict_next_draw():
+    """
+    Llama a modelo_powerball.predict_from_last_draw() y devuelve JSON con meta info.
+    """
     try:
-        nums, pb = predict_from_last_draw()
-        return {
-            "suggested_numbers": nums,
-            "suggested_powerball": pb
-        }
+        res = modelo_powerball.predict_from_last_draw()
+        # res ya es dict con keys numbers,powerball,source,model_loaded,...
+        return JSONResponse(content=res)
     except Exception as e:
-        return {"error": str(e)}
+        return JSONResponse(status_code=500, content={"error": str(e)})
 
-# ====== Para correr local ======
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8000))  # Render asigna el puerto automáticamente
+    port = int(os.environ.get("PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=port)
-
