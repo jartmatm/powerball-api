@@ -57,4 +57,5 @@ model.fit(X_sc, Y_sc, epochs=200, batch_size=256, verbose=1)
 
 # ========= 4) Guardar =========
 model.save("modelo_powerball.keras")
+df.to_csv("historical_draws.csv", index=False)
 print("Modelo guardado como modelo_powerball.keras")
